@@ -99,6 +99,12 @@ class Mpesa:
         self.headers = {"Authorization": f"Bearer {self._access_token}"}
 
     def _set_access_token(self) -> None:
+        """
+        Set the OAuth access token.
+
+        This method retrieves a new OAuth access token using the provided consumer key and secret,
+        and sets the token along with its expiry time.
+        """
         token_data, _ = oauth_generate_token(
             self.consumer_key, self.consumer_secret, env=self.env
         )
@@ -113,15 +119,33 @@ class Mpesa:
 
     @classmethod
     def _is_token_expired(cls) -> bool:
+        """
+        Check if the current OAuth token is expired.
+
+        :return: True if the token is expired or not set, False otherwise.
+        """
         return cls._token_expiry is None or datetime.now() >= cls._token_expiry
 
     def _ensure_valid_token(self) -> None:
+        """
+        Ensure the OAuth token is valid.
+
+        If the token is expired, this method will refresh it.
+        """
         if self._is_token_expired():
             self._set_access_token()
 
     def _make_request(
         self, url: str, payload: Dict[str, Any], method: str
     ) -> Optional[requests.Response]:
+        """
+        Make an API request to the Mpesa server.
+
+        :param url: The API endpoint URL.
+        :param payload: The payload data for the request.
+        :param method: The HTTP method (e.g., 'POST').
+        :return: The response object if the request is successful, None otherwise.
+        """
         self._ensure_valid_token()
         try:
             req = requests.request(
@@ -140,6 +164,15 @@ class Mpesa:
         url_func: callable,
         method: str = "POST",
     ) -> Tuple[Union[Dict[str, Any], str], int]:
+        """
+        Process the request data, validate it, and make the API request.
+
+        :param data: The request data.
+        :param model: The Pydantic model for validation.
+        :param url_func: The function to get the endpoint URL.
+        :param method: The HTTP method (default: 'POST').
+        :return: A tuple containing the response data and status code.
+        """
         try:
             payload = model(**data).dict()
         except ValidationError as e:
@@ -165,6 +198,32 @@ class Mpesa:
     def b2b_payment_request(
         self, data: Dict[str, Any]
     ) -> Tuple[Union[Dict[str, Any], str], int]:
+        """
+        B2B Payment request.
+
+        Initiates a B2B payment transaction from one company to another.
+
+        API Endpoint:
+            POST /mpesa/b2b/v1/paymentrequest
+
+        :param data: A dictionary containing the request data. It should include the following keys:
+            - 'Initiator': The name of the initiator.
+            - 'SecurityCredential': The security credential.
+            - 'CommandID': The command ID. (e.g., 'BusinessPayBill', 'BusinessBuyGoods', etc.)
+            - 'SenderIdentifierType': The type of identifier for the sender. (e.g., '4' for shortcode)
+            - 'ReceiverIdentifierType': The type of identifier for the receiver. (e.g., '4' for shortcode)
+            - 'Amount': The transaction amount.
+            - 'PartyA': The sender's shortcode.
+            - 'PartyB': The receiver's shortcode.
+            - 'Remarks': Any remarks for the transaction.
+            - 'QueueTimeOutURL': The URL to receive a timeout response.
+            - 'ResultURL': The URL to receive the result of the transaction.
+
+        :return: A tuple containing the response data and status code.
+            - If the request is successful, the response data will be a dictionary containing transaction details.
+            - If the request fails, the response data will be a dictionary with a message indicating the failure reason.
+            - The status code indicates the success (200) or failure (4xx or 5xx) of the request.
+        """
         return self._process_and_request(
             data, B2BPaymentRequest, self.urls.get_b2b_payment_request_url
         )
@@ -172,6 +231,31 @@ class Mpesa:
     def b2c_payment_request(
         self, data: Dict[str, Any]
     ) -> Tuple[Union[Dict[str, Any], str], int]:
+        """
+        B2C Payment Request.
+
+        Initiates a B2C payment transaction from a company to a client.
+
+        API Endpoint:
+            POST /mpesa/b2c/v1/paymentrequest
+
+        :param data: A dictionary containing the request data. It should include the following keys:
+            - 'InitiatorName': The name of the initiator.
+            - 'SecurityCredential': The security credential.
+            - 'CommandID': The command ID. (e.g., 'BusinessPayment', 'SalaryPayment', etc.)
+            - 'Amount': The transaction amount.
+            - 'PartyA': The shortcode initiating the transaction.
+            - 'PartyB': The recipient's phone number.
+            - 'Remarks': Any remarks for the transaction.
+            - 'QueueTimeOutURL': The URL to receive a timeout response.
+            - 'ResultURL': The URL to receive the result of the transaction.
+            - 'Occasion': The occasion for the transaction.
+
+        :return: A tuple containing the response data and status code.
+            - If the request is successful, the response data will be a dictionary containing transaction details.
+            - If the request fails, the response data will be a dictionary with a message indicating the failure reason.
+            - The status code indicates the success (200) or failure (4xx or 5xx) of the request.
+        """
         return self._process_and_request(
             data, B2CPaymentRequest, self.urls.get_b2c_payment_request_url
         )
@@ -221,6 +305,30 @@ class Mpesa:
     def lipa_na_mpesa_online_payment(
         self, data: Dict[str, Any]
     ) -> Tuple[Union[Dict[str, Any], str], int]:
+        """
+        Lipa Na M-Pesa Online Payment.
+
+        Initiates an online payment using STK Push for Lipa Na M-Pesa.
+
+        API Endpoint:
+            POST /mpesa/stkpush/v1/processrequest
+
+        :param data: A dictionary containing the request data. It should include the following keys:
+            - 'BusinessShortCode': The business shortcode.
+            - 'Password': The password for the online access.
+            - 'Amount': The transaction amount.
+            - 'PartyA': The initiating shortcode.
+            - 'PartyB': The business shortcode.
+            - 'PhoneNumber': The customer's phone number.
+            - 'CallBackURL': The URL to receive the callback response.
+            - 'AccountReference': The reference for the transaction.
+            - 'TransactionDesc': The description of the transaction.
+
+        :return: A tuple containing the response data and status code.
+            - If the request is successful, the response data will be a dictionary containing transaction details.
+            - If the request fails, the response data will be a dictionary with a message indicating the failure reason.
+            - The status code indicates the success (200) or failure (4xx or 5xx) of the request.
+        """
         return self._process_and_request(
             data, LipaNaMpesaOnlinePayment, self.urls.get_stk_push_process_url
         )
