@@ -20,7 +20,7 @@ of initiating transactions, querying transaction status, and performing other M-
 
 You can install the M-Pesa SDK via pip:
    ```bash
-   pip install pympesa
+   pip install py-mpesa
    ```
 
 
