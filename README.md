@@ -26,7 +26,7 @@ You can install the M-Pesa SDK via pip:
 
 ***Usage***
 ```python
-from mpesa-sdk.mpesa import Mpesa
+from py-mpesa.mpesa import Mpesa
 
 # Initialize Mpesa instance
 mpesa = Mpesa(consumer_key='YOUR_CONSUMER_KEY', consumer_secret='YOUR_CONSUMER_SECRET', env='sandbox')
