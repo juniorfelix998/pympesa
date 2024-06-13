@@ -4,7 +4,7 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 setup(
-    name="py_mpesa",
+    name="py_mpesa_daraja_api",
     version="0.0.1",
     description="Mpesa library that can be used to make api calls to mpesa daraja API",
     packages=find_packages(),

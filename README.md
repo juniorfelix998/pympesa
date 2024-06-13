@@ -20,13 +20,13 @@ of initiating transactions, querying transaction status, and performing other M-
 
 You can install the M-Pesa SDK via pip:
    ```bash
-   pip install py_mpesa
+   pip install py_mpesa_daraja_api
    ```
 
 
 ***Usage***
 ```python
-from py_mpesa.mpesa import Mpesa
+from py_mpesa_daraja_api.mpesa import Mpesa
 
 # Initialize Mpesa instance
 mpesa = Mpesa(consumer_key='YOUR_CONSUMER_KEY', consumer_secret='YOUR_CONSUMER_SECRET', env='sandbox')

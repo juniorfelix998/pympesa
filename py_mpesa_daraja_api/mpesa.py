@@ -32,10 +32,10 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, Optional, Tuple, Union, Type
 from pydantic import BaseModel, ValidationError
 
-from py_mpesa.mpesa_urls import MpesaURLs
-from py_mpesa.auth import oauth_generate_token
+from py_mpesa_daraja_api.mpesa_urls import MpesaURLs
+from py_mpesa_daraja_api.auth import oauth_generate_token
 
-from py_mpesa.mpesa_models import (
+from py_mpesa_daraja_api.mpesa_models import (
     B2BPaymentRequest,
     B2CPaymentRequest,
     C2BRegisterURL,
