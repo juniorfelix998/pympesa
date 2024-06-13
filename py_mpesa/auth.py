@@ -3,7 +3,7 @@ import logging
 import requests
 
 from typing import Any, Dict, Optional, Tuple
-from mpesa_urls import MpesaURLs
+from py_mpesa.mpesa_urls import MpesaURLs
 
 
 logger = logging.getLogger(__name__)
